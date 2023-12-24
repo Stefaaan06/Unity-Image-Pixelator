@@ -1,0 +1,22 @@
+{
+  "name": "com.stefaaan06.unity_image_pixelator",
+  "version": "1.2.1",
+  "displayName": "Unity Image Pixelator",
+  "description": "Allows you to pixelate images in the editor and at runtime.",
+  "unity": "2018.3",
+  
+  "keywords": [
+      "unity",
+      "UI",
+      "pixelate",
+      "imagePixelator",
+      "documentation"
+  ],
+
+  "category": "Open-Source",
+    
+  "author": {
+    "name": "Stefaaan06",
+    "url": "https://stefaaan06.com"
+  }
+}

@@ -8,6 +8,11 @@ Unity Image Pixelator is a  simple tool that allows you to Pixelate & de-Pixelat
     Control speed
     Full documentation
 
+# How it works
+
+This script pixelates the texture of an image at runtime, meaning that there won´t be any changes to the image. It´s worth noting that having different pixelation sizes for the same texture is not possible as it modifies the texture directly. 
+The script has only very little runtime overhead, but it might grow significantly when trying to pixelate large textures with a lot of pixels. If that´s the case its worth looking into multithreading the code.
+
 # Installation
     
 To use the Unity Image Pixelator in your Unity project, follow these steps:

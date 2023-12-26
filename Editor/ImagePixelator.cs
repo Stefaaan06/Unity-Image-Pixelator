@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Method to pixelate an image
 /// <author>Stefaaan06</author>
-/// <version>1.0.0</version>
+/// <version>1.1.0</version>
 /// </summary>
 public class ImagePixelator : MonoBehaviour
 {
@@ -14,16 +14,29 @@ public class ImagePixelator : MonoBehaviour
     public int columns = 4; // Number of columns
     public float delayBetweenParts = 0.5f; // Delay between each part in seconds
 
-    private Image image;    //the attached image
-    private Color[,] originalColors;    //the original colors of the image
-    private Coroutine splitCoroutine;  //the coroutine that splits the image
+    private Image _image;    //the attached image
+    private Color[,] _originalColors;    //the original colors of the image
+    private Coroutine _splitCoroutine;  //the coroutine that splits the image
 
-    
-    void Start()
+    void Awake()
     {
-        image = GetComponent<Image>();
-        originalColors = GetOriginalColors(image.sprite.texture);
+        _image = GetComponent<Image>();
+
+        Texture2D newTexture = new Texture2D(_image.sprite.texture.width, _image.sprite.texture.height);
+
+        newTexture.SetPixels(_image.sprite.texture.GetPixels());
+        newTexture.Apply();
+
+        Rect rect = new Rect(0, 0, newTexture.width, newTexture.height);
+        Vector2 pivot = new Vector2(0.5f, 0.5f);
+        Sprite newSprite = Sprite.Create(newTexture, rect, pivot);
+
+        _image.sprite = newSprite;
+
+        _originalColors = GetOriginalColors(_image.sprite.texture);
+
     }
+    
     
     /// <summary>
     /// Restore the original image when the application quits / a new scene is loaded to prevent the loss of the original image
@@ -42,15 +55,16 @@ public class ImagePixelator : MonoBehaviour
     /// <summary>
     /// Call this to start the pixelation process
     /// </summary>
-    void PixelateImage()
+    public void PixelateImage()
     {
+        StopAllCoroutines();
         RestoreOriginalImage();
-        if (splitCoroutine != null)
+        if (_splitCoroutine != null)
         {
-            StopCoroutine(splitCoroutine);
+            StopCoroutine(_splitCoroutine);
         }
 
-        splitCoroutine = StartCoroutine(PixelateImageCoroutine());
+        _splitCoroutine = StartCoroutine(PixelateImageCoroutine());
     }
 
     /// <summary>
@@ -90,8 +104,8 @@ public class ImagePixelator : MonoBehaviour
     /// <param name="col">col index</param>
     void SetPartTransparent(int row, int col)
     {
-        int width = image.sprite.texture.width;
-        int height = image.sprite.texture.height;
+        int width = _image.sprite.texture.width;
+        int height = _image.sprite.texture.height;
 
         int partWidth = width / columns;
         int partHeight = height / rows;
@@ -102,8 +116,8 @@ public class ImagePixelator : MonoBehaviour
             transparentColors[i] = Color.clear;
         }
 
-        image.sprite.texture.SetPixels(col * partWidth, row * partHeight, partWidth, partHeight, transparentColors);
-        image.sprite.texture.Apply();
+        _image.sprite.texture.SetPixels(col * partWidth, row * partHeight, partWidth, partHeight, transparentColors);
+        _image.sprite.texture.Apply();
     }
 
     /// <summary>
@@ -111,14 +125,15 @@ public class ImagePixelator : MonoBehaviour
     /// </summary>
    public void RestoreOriginalImage()
     {
-        SetImageColors(originalColors);
+        SetImageColors(_originalColors);
     }
     
     /// <summary>
     ///  Restores the original image
     /// </summary>
-    void RePixelateImage()
+    public void RePixelateImage()
     {
+        StopAllCoroutines();
         StartCoroutine(RePixelateCoroutine());
     }
     
@@ -129,7 +144,9 @@ public class ImagePixelator : MonoBehaviour
     IEnumerator RePixelateCoroutine()
     {
         // Make all pixels transparent at the start
-        SetImageColors(GetTransparentColors(image.sprite.texture));
+        if(_image == null)
+            _image = GetComponent<Image>();
+        SetImageColors(GetTransparentColors(_image.sprite.texture));
 
         int totalParts = rows * columns;
         int[] indices = new int[totalParts];
@@ -163,8 +180,8 @@ public class ImagePixelator : MonoBehaviour
     /// <param name="col">Column index of the Part</param>
     void SetPartOriginal(int row, int col)
     {
-        int width = image.sprite.texture.width;
-        int height = image.sprite.texture.height;
+        int width = _image.sprite.texture.width;
+        int height = _image.sprite.texture.height;
 
         int partWidth = width / columns;
         int partHeight = height / rows;
@@ -174,13 +191,13 @@ public class ImagePixelator : MonoBehaviour
         {
             for (int j = 0; j < partWidth; j++)
             {
-                Color color = originalColors[col * partWidth + j, row * partHeight + i];
-                image.sprite.texture.SetPixel(col * partWidth + j, row * partHeight + i, color);
+                Color color = _originalColors[col * partWidth + j, row * partHeight + i];
+                _image.sprite.texture.SetPixel(col * partWidth + j, row * partHeight + i, color);
             }
         }
 
         // Apply the changes to the texture
-        image.sprite.texture.Apply();
+        _image.sprite.texture.Apply();
     }
 
     /// <summary>
@@ -233,8 +250,8 @@ public class ImagePixelator : MonoBehaviour
     /// <param name="colors">2D array of colors</param>
     void SetImageColors(Color[,] colors)
     {
-        int width = image.sprite.texture.width;
-        int height = image.sprite.texture.height;
+        int width = _image.sprite.texture.width;
+        int height = _image.sprite.texture.height;
 
         Color[] flatColors = new Color[width * height];
 
@@ -246,7 +263,7 @@ public class ImagePixelator : MonoBehaviour
             }
         }
 
-        image.sprite.texture.SetPixels(flatColors);
-        image.sprite.texture.Apply();
+        _image.sprite.texture.SetPixels(flatColors);
+        _image.sprite.texture.Apply();
     }
 }

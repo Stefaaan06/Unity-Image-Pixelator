@@ -25,6 +25,8 @@ To use the Unity Image Pixelator in your Unity project, follow these steps:
     Add a new package using the projects url: https://github.com/Stefaaan06/Unity-Editor-Physics-Simulation.git
 2.
     Copy the ImagePixelator.cs into your project's Assets directory.
+    
+Alternatively you can just download the repository and copy the "EditorPhysicsTool.cs" script into your Unity project's "Assets/Editor" directory.
 
 # Usage
     Add the "ImagePixelator.cs" script to a gameobject with a Image component.
